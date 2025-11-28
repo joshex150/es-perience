@@ -155,7 +155,30 @@ export default function About() {
             // Calculate which block should be active
             // Each block gets exactly 1/totalBlocks of the scroll distance
             const blockSize = 1 / totalBlocks
-            let currentBlock = Math.floor(progress / blockSize)
+            const transitionDuration = blockSize * 0.2 // Match the transition duration used in timeline
+            
+            // Determine active block based on transition boundaries
+            // Transitions start at blockStart - transitionDuration
+            let currentBlock = 0
+            
+            for (let i = 0; i < totalBlocks; i++) {
+              const blockStart = i * blockSize
+              const transitionStart = blockStart - transitionDuration
+              
+              // For the first block, check if we're before the first transition
+              if (i === 0) {
+                const firstTransitionStart = blockSize - transitionDuration
+                if (progress < firstTransitionStart) {
+                  currentBlock = 0
+                  break
+                }
+              }
+              
+              // For other blocks, check if we're past the transition start
+              if (progress >= transitionStart) {
+                currentBlock = i
+              }
+            }
             
             // Clamp to valid range
             currentBlock = Math.min(Math.max(currentBlock, 0), totalBlocks - 1)
