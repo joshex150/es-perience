@@ -141,11 +141,47 @@ export default function About() {
           onUpdate: (self) => {
             // Update active block based on scroll progress
             const progress = Math.min(Math.max(self.progress, 0), 1) // Clamp between 0 and 1
-            const totalBlockProgress = progress * totalBlocks
-            const currentBlock = Math.min(Math.floor(totalBlockProgress), totalBlocks - 1)
+            
+            // Calculate which block should be active
+            // Each block gets 1/totalBlocks of the scroll distance
+            // We want to switch to the next block only when we're past the midpoint of the current block's scroll range
+            const blockSize = 1 / totalBlocks
+            let currentBlock = 0
+            
+            // Determine active block based on progress ranges
+            // Block 0: 0 to blockSize
+            // Block 1: blockSize to 2*blockSize
+            // Block 2: 2*blockSize to 1
+            for (let i = 0; i < totalBlocks; i++) {
+              const blockStart = i * blockSize
+              const blockEnd = (i + 1) * blockSize
+              
+              // For the last block, include the end
+              if (i === totalBlocks - 1) {
+                if (progress >= blockStart) {
+                  currentBlock = i
+                  break
+                }
+              } else {
+                // For other blocks, use midpoint to determine when to switch
+                const blockMidpoint = blockStart + (blockSize * 0.5)
+                if (progress < blockMidpoint) {
+                  currentBlock = i
+                  break
+                } else if (progress < blockEnd) {
+                  currentBlock = i
+                  break
+                }
+              }
+            }
+            
+            // Ensure currentBlock is within valid range
+            currentBlock = Math.min(Math.max(currentBlock, 0), totalBlocks - 1)
             
             // Calculate progress within the current block (0-1)
-            const progressInBlock = totalBlockProgress - currentBlock
+            const blockStart = currentBlock * blockSize
+            const blockEnd = (currentBlock + 1) * blockSize
+            const progressInBlock = (progress - blockStart) / (blockEnd - blockStart)
             const normalizedBlockProgress = Math.min(Math.max(progressInBlock, 0), 1)
             
             // Update active block if changed
