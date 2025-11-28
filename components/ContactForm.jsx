@@ -31,8 +31,8 @@ export default function ContactForm() {
   }
 
   return (
-    <section id="contact" className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-cream">
-      <div className="max-w-3xl mx-auto">
+    <section id="contact" className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-cream overflow-x-hidden">
+      <div className="max-w-3xl mx-auto w-full">
         <motion.div
           className="text-center mb-12"
           initial={{ opacity: 0, y: 30 }}
@@ -50,7 +50,7 @@ export default function ContactForm() {
         <motion.form
           ref={ref}
           onSubmit={handleSubmit}
-          className="space-y-6"
+          className="space-y-6 w-full overflow-x-hidden"
           initial={{ opacity: 0, y: 50 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
           transition={{ duration: 0.8, delay: 0.2 }}
@@ -145,7 +145,8 @@ export default function ContactForm() {
               name="eventDate"
               value={formData.eventDate}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border-2 border-burgundy/20 bg-cream text-coffee-brown focus:outline-none focus:border-burgundy focus:ring-2 focus:ring-burgundy/20 transition-all duration-300"
+              className="w-full max-w-full px-4 py-3 rounded-lg border-2 border-burgundy/20 bg-cream text-coffee-brown focus:outline-none focus:border-burgundy focus:ring-2 focus:ring-burgundy/20 transition-all duration-300"
+              style={{ maxWidth: '100%', boxSizing: 'border-box' }}
             />
           </div>
 
