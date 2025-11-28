@@ -221,7 +221,8 @@ export default function Header() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-md z-40 top-20"
+              className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-md z-[60]"
+              style={{ top: '80px' }}
               onClick={() => setIsMobileMenuOpen(false)}
             />
           )}
@@ -239,7 +240,8 @@ export default function Header() {
                 duration: 0.35, 
                 ease: [0.25, 0.46, 0.45, 0.94]
               }}
-              className="md:hidden fixed inset-x-0 top-20 bottom-0 z-50 overflow-y-auto"
+              className="md:hidden fixed inset-x-0 bottom-0 z-[70] overflow-y-auto"
+              style={{ top: '80px' }}
             >
               <div className="h-full bg-gradient-to-b from-cream via-cream to-cream/98 backdrop-blur-2xl">
                 {/* Menu Header */}
