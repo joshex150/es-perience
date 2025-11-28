@@ -27,7 +27,7 @@ const contentBlocks = [
   {
     id: 'signature-style',
     heading: 'Signature Style',
-    image: 'https://dummyimage.com/600x800/800020/FFF8E7',
+    image: 'https://dummyimage.com/600x800/4B3C2B/FFF8E7',
     content: [
       'Our signature style is defined by an unwavering commitment to perfection and an intuitive understanding of what makes moments truly unforgettable. We blend artistic vision with meticulous execution, creating seamless experiences that feel effortless yet extraordinary.',
       'Every detail matters—from the grandest gesture to the smallest touch. This philosophy has earned us recognition as leaders in luxury event planning, trusted by discerning clients who demand nothing but the best.',
