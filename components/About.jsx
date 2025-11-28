@@ -316,7 +316,7 @@ export default function About() {
         <div className="hidden lg:flex absolute bottom-20 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
           <div className="flex items-center space-x-3 bg-cream/95 backdrop-blur-md px-6 py-3 rounded-full shadow-xl border border-burgundy/20">
             {/* Progress Dots */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-4">
               {contentBlocks.map((block, index) => {
                 const isActive = activeBlock === index
                 
