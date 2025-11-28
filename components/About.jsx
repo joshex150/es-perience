@@ -9,7 +9,7 @@ const contentBlocks = [
   {
     id: 'about-planner',
     heading: 'About the Planner',
-    image: 'https://placehold.co/600x800/800020/FFF8E7?text=About+Us',
+    image: 'https://dummyimage.com/600x800/800020/FFF8E7&text=About+Us',
     content: [
       'With over a decade of experience in luxury event planning, we specialize in creating extraordinary moments that leave lasting impressions. Our team of dedicated professionals brings creativity, attention to detail, and unparalleled service to every event we plan.',
       'From intimate weddings to grand corporate galas, we transform visions into reality, ensuring every detail is meticulously crafted and every moment is perfectly orchestrated.',
@@ -18,7 +18,7 @@ const contentBlocks = [
   {
     id: 'philosophy',
     heading: 'Our Philosophy',
-    image: 'https://placehold.co/600x800/4B2E2A/FFF8E7?text=Philosophy',
+    image: 'https://dummyimage.com/600x800/4B2E2A/FFF8E7&text=Philosophy',
     content: [
       'We believe that every event tells a story, and our role is to bring that narrative to life with elegance and precision. Our approach combines timeless sophistication with modern innovation, creating experiences that resonate deeply with our clients and their guests.',
       'Excellence is not a destination but a journey. We continuously refine our craft, staying ahead of trends while honoring the classic principles of luxury event design.',
@@ -27,7 +27,7 @@ const contentBlocks = [
   {
     id: 'signature-style',
     heading: 'Signature Style',
-    image: 'https://placehold.co/600x800/800020/FFF8E7?text=Style',
+    image: 'https://dummyimage.com/600x800/800020/FFF8E7&text=Style',
     content: [
       'Our signature style is defined by an unwavering commitment to perfection and an intuitive understanding of what makes moments truly unforgettable. We blend artistic vision with meticulous execution, creating seamless experiences that feel effortless yet extraordinary.',
       'Every detail matters—from the grandest gesture to the smallest touch. This philosophy has earned us recognition as leaders in luxury event planning, trusted by discerning clients who demand nothing but the best.',
@@ -56,6 +56,27 @@ export default function About() {
 
     // Check if mobile (no GSAP on mobile)
     const isMobile = window.innerWidth < 768
+
+    // Mobile: Ensure first image is visible
+    if (isMobile && images[0]) {
+      // Force first image to be visible on mobile
+      const firstImage = images[0]
+      if (firstImage) {
+        firstImage.style.opacity = '1'
+        firstImage.style.display = 'block'
+        firstImage.style.position = 'relative'
+        firstImage.style.visibility = 'visible'
+      }
+      
+      // Hide other images on mobile
+      for (let i = 1; i < images.length; i++) {
+        if (images[i]) {
+          images[i].style.opacity = '0'
+          images[i].style.display = 'none'
+          images[i].style.visibility = 'hidden'
+        }
+      }
+    }
 
     // Only run GSAP animations on desktop
     if (!isMobile) {
@@ -221,8 +242,11 @@ export default function About() {
                   if (el) imageRefs.current[index] = el
                 }}
                 className={`${
-                  index === 0 ? 'opacity-100 block' : 'opacity-0 hidden'
-                } lg:opacity-0 lg:absolute lg:inset-0 lg:block relative`}
+                  index === 0 
+                    ? 'opacity-100 block relative z-10' 
+                    : 'opacity-0 hidden lg:opacity-0'
+                } lg:absolute lg:inset-0 lg:block lg:z-0`}
+                style={index === 0 ? { position: 'relative' } : undefined}
               >
                 <div className="relative w-full h-full rounded-lg overflow-hidden shadow-2xl">
                   <Image

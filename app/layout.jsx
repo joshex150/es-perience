@@ -196,7 +196,7 @@ export default function RootLayout({ children }) {
         {/* Preconnect to external domains */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://placehold.co" />
+        <link rel="dns-prefetch" href="https://dummyimage.com" />
         
         {/* Preload critical fonts */}
         <link

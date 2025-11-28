@@ -9,7 +9,7 @@ export default function Hero() {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0" aria-hidden="true">
         <Image
-          src="https://placehold.co/1920x1080/800020/FFF8E7"
+          src="https://dummyimage.com/1920x1080/800020/FFF8E7"
           alt="Elegant luxury event setting with sophisticated décor and ambient lighting"
           fill
           className="object-cover"

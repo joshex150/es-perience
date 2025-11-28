@@ -9,32 +9,32 @@ const services = [
   {
     title: 'Wedding Planning',
     description: 'Complete wedding planning services from concept to execution, ensuring your special day is flawless.',
-    image: 'https://placehold.co/600x800/000000/FFF',
+    image: 'https://dummyimage.com/600x800/000000/FFF',
   },
   {
     title: 'Corporate Events',
     description: 'Professional corporate event management for conferences, galas, and company celebrations.',
-    image: 'https://placehold.co/600x800/000000/FFF',
+    image: 'https://dummyimage.com/600x800/000000/FFF',
   },
   {
     title: 'Private Celebrations',
     description: 'Intimate gatherings and milestone celebrations tailored to your unique vision and style.',
-    image: 'https://placehold.co/600x800/000000/FFF',
+    image: 'https://dummyimage.com/600x800/000000/FFF',
   },
   {
     title: 'Venue Selection',
     description: 'Expert guidance in finding the perfect venue that matches your event style and requirements.',
-    image: 'https://placehold.co/600x800/000000/FFF',
+    image: 'https://dummyimage.com/600x800/000000/FFF',
   },
   {
     title: 'Catering Coordination',
     description: 'Curated culinary experiences with top-tier caterers to delight your guests.',
-    image: 'https://placehold.co/600x800/000000/FFF',
+    image: 'https://dummyimage.com/600x800/000000/FFF',
   },
   {
     title: 'Design & Décor',
     description: 'Breathtaking design concepts and flawless décor execution to create stunning atmospheres.',
-    image: 'https://placehold.co/600x800/000000/FFF',
+    image: 'https://dummyimage.com/600x800/000000/FFF',
   },
 ]
 

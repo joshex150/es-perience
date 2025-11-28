@@ -6,12 +6,12 @@ import { useRef } from 'react'
 import Image from 'next/image'
 
 const portfolioItems = [
-  { image: 'https://placehold.co/600x800/000000/FFF', title: 'Elegant Wedding', category: 'Wedding' },
-  { image: 'https://placehold.co/600x800/000000/FFF', title: 'Corporate Gala', category: 'Corporate' },
-  { image: 'https://placehold.co/600x800/000000/FFF', title: 'Garden Celebration', category: 'Celebration' },
-  { image: 'https://placehold.co/600x800/000000/FFF', title: 'Luxury Reception', category: 'Reception' },
-  { image: 'https://placehold.co/600x800/000000/FFF', title: 'Intimate Gathering', category: 'Private' },
-  { image: 'https://placehold.co/600x800/000000/FFF', title: 'Anniversary Party', category: 'Celebration' },
+  { image: 'https://dummyimage.com/600x800/000000/FFF', title: 'Elegant Wedding', category: 'Wedding' },
+  { image: 'https://dummyimage.com/600x800/000000/FFF', title: 'Corporate Gala', category: 'Corporate' },
+  { image: 'https://dummyimage.com/600x800/000000/FFF', title: 'Garden Celebration', category: 'Celebration' },
+  { image: 'https://dummyimage.com/600x800/000000/FFF', title: 'Luxury Reception', category: 'Reception' },
+  { image: 'https://dummyimage.com/600x800/000000/FFF', title: 'Intimate Gathering', category: 'Private' },
+  { image: 'https://dummyimage.com/600x800/000000/FFF', title: 'Anniversary Party', category: 'Celebration' },
 ]
 
 export default function Portfolio() {
