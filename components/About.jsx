@@ -129,53 +129,35 @@ export default function About() {
       const totalBlocks = contentBlocks.length
 
       // Create main timeline with ScrollTrigger (desktop only)
+      // Each block gets exactly equal scroll distance: 500vh / 3 = ~166.67vh per block
+      const totalScrollDistance = 500 // Total scroll distance in vh
+      const scrollPerBlock = totalScrollDistance / totalBlocks // Equal distance per block
+      
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
           start: 'top top',
-          end: '+=500vh', // Increased scroll distance for slower transitions
-          scrub: 1.5, // Smoother scrubbing - reduced for less lag
+          end: `+=${totalScrollDistance}vh`, // Total scroll distance
+          scrub: 1.5, // Smoother scrubbing
           pin: true,
           anticipatePin: 1,
           pinSpacing: true,
+          snap: {
+            snapTo: 1 / totalBlocks, // Snap to each block (0, 0.333, 0.666, 1.0)
+            duration: { min: 0.2, max: 0.6 },
+            delay: 0,
+            ease: 'power1.inOut',
+          },
           onUpdate: (self) => {
             // Update active block based on scroll progress
             const progress = Math.min(Math.max(self.progress, 0), 1) // Clamp between 0 and 1
             
             // Calculate which block should be active
-            // Each block gets 1/totalBlocks of the scroll distance
-            // We want to switch to the next block only when we're past the midpoint of the current block's scroll range
+            // Each block gets exactly 1/totalBlocks of the scroll distance
             const blockSize = 1 / totalBlocks
-            let currentBlock = 0
+            let currentBlock = Math.floor(progress / blockSize)
             
-            // Determine active block based on progress ranges
-            // Block 0: 0 to blockSize
-            // Block 1: blockSize to 2*blockSize
-            // Block 2: 2*blockSize to 1
-            for (let i = 0; i < totalBlocks; i++) {
-              const blockStart = i * blockSize
-              const blockEnd = (i + 1) * blockSize
-              
-              // For the last block, include the end
-              if (i === totalBlocks - 1) {
-                if (progress >= blockStart) {
-                  currentBlock = i
-                  break
-                }
-              } else {
-                // For other blocks, use midpoint to determine when to switch
-                const blockMidpoint = blockStart + (blockSize * 0.5)
-                if (progress < blockMidpoint) {
-                  currentBlock = i
-                  break
-                } else if (progress < blockEnd) {
-                  currentBlock = i
-                  break
-                }
-              }
-            }
-            
-            // Ensure currentBlock is within valid range
+            // Clamp to valid range
             currentBlock = Math.min(Math.max(currentBlock, 0), totalBlocks - 1)
             
             // Calculate progress within the current block (0-1)
@@ -206,20 +188,19 @@ export default function About() {
           },
         },
       })
-      // Each block gets exactly equal scroll distance
-      const scrollPerBlock = 1 / totalBlocks
-      const transitionDuration = scrollPerBlock * 0.2 // Transition takes 20% of block time
+      // Each block gets exactly equal scroll distance (normalized 0-1)
+      const scrollPerBlockNormalized = 1 / totalBlocks
+      const transitionDuration = scrollPerBlockNormalized * 0.15 // Transition takes 15% of block time
 
       contentBlocks.forEach((block, index) => {
         // Calculate exact progress points for equal distribution
         // Each block occupies exactly 1/totalBlocks of the scroll distance
-        const blockStart = index * scrollPerBlock
-        const blockEnd = (index + 1) * scrollPerBlock
+        const blockStart = index * scrollPerBlockNormalized
+        const blockEnd = (index + 1) * scrollPerBlockNormalized
         
-        // Transition starts at 80% through current block, ends at 20% of next block
-        // This ensures equal spacing: 80% visible + 20% transition = 100% of block
-        const transitionStart = blockStart + scrollPerBlock * 0.8
-        const transitionEnd = blockEnd
+        // Transition starts at 85% through current block
+        // This ensures: 85% visible + 15% transition = 100% of block
+        const transitionStart = blockStart + scrollPerBlockNormalized * 0.85
 
         if (index === 0) {
           // First block: ensure it's visible from the start
@@ -249,8 +230,8 @@ export default function About() {
 
         if (index > 0) {
           const prevIndex = index - 1
-          const prevBlockStart = prevIndex * scrollPerBlock
-          const prevTransitionStart = prevBlockStart + scrollPerBlock * 0.8
+          const prevBlockStart = prevIndex * scrollPerBlockNormalized
+          const prevTransitionStart = prevBlockStart + scrollPerBlockNormalized * 0.85
 
           // Fade out previous content at the exact transition point
           tl.to(
@@ -294,7 +275,7 @@ export default function About() {
               scale: 1,
               y: 0,
               filter: 'blur(0px)',
-              duration: scrollPerBlock * 0.8 - transitionDuration,
+              duration: scrollPerBlockNormalized * 0.85 - transitionDuration,
               ease: 'none',
             },
             prevTransitionStart + transitionDuration
@@ -338,32 +319,25 @@ export default function About() {
             <div className="flex items-center space-x-2">
               {contentBlocks.map((block, index) => {
                 const isActive = activeBlock === index
-                const isPrevious = index === activeBlock - 1
-                const isNext = index === activeBlock + 1
                 
-                // Calculate dot width based on state
-                let dotWidth = 2 // Default inactive width
-                
-                if (isActive) {
-                  // Active dot: expand from 8px to 32px based on progress
-                  dotWidth = 8 + (blockProgress * 24)
-                } else if (isPrevious && blockProgress < 0.3) {
-                  // Previous dot: shrink slightly as we move away
-                  dotWidth = 2 + (blockProgress * 2)
-                } else if (isNext && blockProgress > 0.7) {
-                  // Next dot: expand slightly as we approach
-                  dotWidth = 2 + ((blockProgress - 0.7) * 6)
-                }
+                // Calculate dot width: active dot expands based on progress, inactive stays small
+                const dotWidth = isActive 
+                  ? Math.max(8, 8 + (blockProgress * 20)) // Expand from 8px to 28px
+                  : 2 // Inactive dots stay at 2px
                 
                 return (
                   <div
                     key={block.id}
-                    className={`relative transition-all duration-200 ease-out ${
+                    className={`relative transition-all duration-300 ease-out ${
                       isActive
                         ? 'bg-burgundy'
                         : 'bg-coffee-brown/30'
                     } h-2 rounded-full`}
-                    style={{ width: `${dotWidth}px`, minWidth: '2px' }}
+                    style={{ 
+                      width: `${dotWidth}px`, 
+                      minWidth: '2px',
+                      maxWidth: '28px'
+                    }}
                     aria-label={block.heading}
                   >
                     <span className="sr-only">{block.heading}</span>
