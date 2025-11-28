@@ -213,90 +213,127 @@ export default function Header() {
         </div>
 
         {/* Mobile Menu Backdrop */}
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
               key="backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="md:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-40 top-20"
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-md z-40 top-20"
               onClick={() => setIsMobileMenuOpen(false)}
             />
           )}
         </AnimatePresence>
 
         {/* Mobile Menu */}
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
               key="menu"
-              initial={{ opacity: 0, y: -10, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.98 }}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
               transition={{ 
-                duration: 0.25, 
-                ease: [0.4, 0, 0.2, 1],
-                opacity: { duration: 0.2 }
+                duration: 0.35, 
+                ease: [0.25, 0.46, 0.45, 0.94]
               }}
-              className="md:hidden relative z-50 mt-3"
+              className="md:hidden fixed inset-x-0 top-20 bottom-0 z-50 overflow-y-auto"
             >
-              <div className="bg-cream/98 backdrop-blur-xl rounded-2xl shadow-2xl border-2 border-burgundy/20 overflow-hidden">
-                <div className="py-3 px-2 pb-4">
+              <div className="h-full bg-gradient-to-b from-cream via-cream to-cream/98 backdrop-blur-2xl">
+                {/* Menu Header */}
+                <div className="px-6 pt-8 pb-6 border-b border-burgundy/10">
+                  <h2 className="text-xl font-cursive text-coffee-brown mb-1">Navigation</h2>
+                  <p className="text-sm text-coffee-brown/60">Explore our services</p>
+                </div>
+
+                {/* Menu Items */}
+                <div className="px-4 py-6 space-y-1">
                   {navLinks.map((link, index) => {
                     const sectionId = link.href.substring(1)
                     const isActive = activeSection === sectionId
                     
                     return (
-                      <motion.a
+                      <motion.div
                         key={link.name}
-                        href={link.href}
-                        onClick={(e) => handleLinkClick(e, link.href)}
-                        className={`relative block px-5 py-3.5 mx-2 rounded-xl font-medium text-base transition-all duration-300 ${
-                          isActive
-                            ? 'text-burgundy bg-burgundy/15 shadow-md'
-                            : 'text-coffee-brown hover:text-burgundy hover:bg-burgundy/8 active:bg-burgundy/12'
-                        }`}
-                        initial={{ opacity: 0, x: -20 }}
+                        initial={{ opacity: 0, x: -30 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ 
-                          delay: index * 0.06,
-                          duration: 0.3,
-                          ease: 'easeOut'
+                          delay: index * 0.05,
+                          duration: 0.4,
+                          ease: [0.25, 0.46, 0.45, 0.94]
                         }}
-                        whileTap={{ scale: 0.97 }}
                       >
-                        {link.name}
-                        {isActive && (
-                          <motion.div
-                            className="absolute left-0 top-0 bottom-0 w-1 bg-burgundy rounded-r-full"
-                            layoutId="mobileActiveSection"
-                            initial={false}
-                            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                          />
-                        )}
-                      </motion.a>
+                        <motion.a
+                          href={link.href}
+                          onClick={(e) => handleLinkClick(e, link.href)}
+                          className={`relative flex items-center justify-between px-5 py-4 rounded-2xl font-medium text-base transition-all duration-300 group ${
+                            isActive
+                              ? 'text-burgundy bg-burgundy/10 shadow-sm'
+                              : 'text-coffee-brown hover:text-burgundy hover:bg-burgundy/5 active:bg-burgundy/8'
+                          }`}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <span className="relative z-10">{link.name}</span>
+                          {isActive && (
+                            <motion.div
+                              className="absolute inset-0 bg-burgundy/8 rounded-2xl border border-burgundy/20"
+                              layoutId="mobileActiveBg"
+                              initial={false}
+                              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                            />
+                          )}
+                          {isActive && (
+                            <motion.div
+                              className="w-2 h-2 rounded-full bg-burgundy"
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ delay: 0.1 }}
+                            />
+                          )}
+                          {!isActive && (
+                            <motion.div
+                              className="w-1.5 h-1.5 rounded-full bg-coffee-brown/20 group-hover:bg-burgundy/30"
+                              transition={{ duration: 0.2 }}
+                            />
+                          )}
+                        </motion.a>
+                      </motion.div>
                     )
                   })}
+                </div>
+
+                {/* Divider */}
+                <div className="px-6 py-4">
+                  <div className="h-px bg-gradient-to-r from-transparent via-burgundy/20 to-transparent" />
+                </div>
+
+                {/* CTA Button */}
+                <div className="px-4 pb-8 pt-2">
                   <motion.div
-                    className="px-2 pt-4"
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ 
-                      delay: navLinks.length * 0.06 + 0.05,
-                      duration: 0.3,
-                      ease: 'easeOut'
+                      delay: navLinks.length * 0.05 + 0.1,
+                      duration: 0.4,
+                      ease: [0.25, 0.46, 0.45, 0.94]
                     }}
                   >
                     <motion.a
                       href="#contact"
                       onClick={(e) => handleLinkClick(e, '#contact')}
-                      className="block w-full px-6 py-3.5 bg-burgundy text-cream rounded-xl font-semibold text-center hover:bg-burgundy/90 active:bg-burgundy/95 transition-all duration-300 shadow-lg hover:shadow-xl"
+                      className="block w-full px-8 py-4 bg-gradient-to-r from-burgundy to-burgundy/90 text-cream rounded-2xl font-semibold text-center shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden group"
                       whileTap={{ scale: 0.97 }}
                       whileHover={{ scale: 1.02 }}
                     >
-                      Get Started
+                      <span className="relative z-10">Get Started</span>
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-burgundy/90 to-burgundy"
+                        initial={{ x: '-100%' }}
+                        whileHover={{ x: 0 }}
+                        transition={{ duration: 0.3 }}
+                      />
                     </motion.a>
                   </motion.div>
                 </div>
