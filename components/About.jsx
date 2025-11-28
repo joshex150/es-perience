@@ -190,20 +190,12 @@ export default function About() {
       })
       // Each block gets exactly equal scroll distance (normalized 0-1)
       const scrollPerBlockNormalized = 1 / totalBlocks
-      const transitionDuration = scrollPerBlockNormalized * 0.15 // Transition takes 15% of block time
+      const transitionDuration = scrollPerBlockNormalized * 0.2 // Transition takes 20% of block time
 
+      // Initialize all blocks with proper states
       contentBlocks.forEach((block, index) => {
-        // Calculate exact progress points for equal distribution
-        // Each block occupies exactly 1/totalBlocks of the scroll distance
-        const blockStart = index * scrollPerBlockNormalized
-        const blockEnd = (index + 1) * scrollPerBlockNormalized
-        
-        // Transition starts at 85% through current block
-        // This ensures: 85% visible + 15% transition = 100% of block
-        const transitionStart = blockStart + scrollPerBlockNormalized * 0.85
-
         if (index === 0) {
-          // First block: ensure it's visible from the start
+          // First block: visible from start
           if (images[0] && textBlocks[0]) {
             gsap.set([textBlocks[0], images[0]], {
               opacity: 1,
@@ -213,90 +205,78 @@ export default function About() {
               immediateRender: true,
             })
           }
-
-          // Ensure all other blocks are completely hidden
-          for (let i = 1; i < totalBlocks; i++) {
-            if (textBlocks[i] && images[i]) {
-              gsap.set([textBlocks[i], images[i]], {
-                opacity: 0,
-                y: 20,
-                scale: 1.02,
-                filter: 'blur(6px)',
-                immediateRender: true,
-              })
-            }
-          }
-        }
-
-        if (index > 0) {
-          const prevIndex = index - 1
-          const prevBlockStart = prevIndex * scrollPerBlockNormalized
-          const prevTransitionStart = prevBlockStart + scrollPerBlockNormalized * 0.85
-
-          // Fade out previous content at the exact transition point
-          tl.to(
-            [textBlocks[prevIndex], images[prevIndex]],
-            {
+        } else {
+          // All other blocks: hidden initially
+          if (textBlocks[index] && images[index]) {
+            gsap.set([textBlocks[index], images[index]], {
               opacity: 0,
-              y: -20,
-              scale: 0.99,
-              filter: 'blur(6px)',
-              duration: transitionDuration,
-              ease: 'sine.inOut',
-            },
-            prevTransitionStart
-          )
-
-          // Fade in current content simultaneously
-          tl.fromTo(
-            [textBlocks[index], images[index]],
-            {
-              opacity: 0,
-              y: 15,
+              y: 20,
               scale: 1.02,
-              filter: 'blur(4px)',
-            },
-            {
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              filter: 'blur(0px)',
-              duration: transitionDuration,
-              ease: 'sine.out',
-            },
-            prevTransitionStart
-          )
-
-          // Keep current content visible for the rest of its block duration
-          tl.to(
-            [textBlocks[index], images[index]],
-            {
-              opacity: 1,
-              scale: 1,
-              y: 0,
-              filter: 'blur(0px)',
-              duration: scrollPerBlockNormalized * 0.85 - transitionDuration,
-              ease: 'none',
-            },
-            prevTransitionStart + transitionDuration
-          )
-
-          // Ensure next block stays hidden until its turn
-          if (index < totalBlocks - 1) {
-            tl.to(
-              [textBlocks[index + 1], images[index + 1]],
-              {
-                opacity: 0,
-                y: 15,
-                scale: 1.02,
-                filter: 'blur(4px)',
-                duration: 0.01,
-                ease: 'none',
-              },
-              blockEnd
-            )
+              filter: 'blur(6px)',
+              immediateRender: true,
+            })
           }
         }
+      })
+
+      // Create transitions for each block boundary
+      contentBlocks.forEach((block, index) => {
+        if (index === 0) return // Skip first block (no previous block)
+
+        const prevIndex = index - 1
+        const blockStart = index * scrollPerBlockNormalized
+        const transitionStart = blockStart - transitionDuration // Start transition slightly before block boundary
+
+        // Fade out previous block
+        tl.to(
+          [textBlocks[prevIndex], images[prevIndex]],
+          {
+            opacity: 0,
+            y: -20,
+            scale: 0.99,
+            filter: 'blur(6px)',
+            duration: transitionDuration,
+            ease: 'sine.inOut',
+          },
+          transitionStart
+        )
+
+        // Fade in current block simultaneously
+        tl.fromTo(
+          [textBlocks[index], images[index]],
+          {
+            opacity: 0,
+            y: 15,
+            scale: 1.02,
+            filter: 'blur(4px)',
+          },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            filter: 'blur(0px)',
+            duration: transitionDuration,
+            ease: 'sine.out',
+          },
+          transitionStart
+        )
+
+        // Keep current block visible for the rest of its duration
+        const blockEnd = (index + 1) * scrollPerBlockNormalized
+        const holdDuration = blockEnd - transitionStart - transitionDuration
+        
+        tl.to(
+          [textBlocks[index], images[index]],
+          {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            filter: 'blur(0px)',
+            duration: holdDuration,
+            ease: 'none',
+          },
+          transitionStart + transitionDuration
+        )
       })
     }
 
