@@ -9,7 +9,7 @@ const contentBlocks = [
   {
     id: 'about-planner',
     heading: 'About the Planner',
-    image: 'https://dummyimage.com/600x800/800020/FFF8E7&text=About+Us',
+    image: 'https://dummyimage.com/600x800/800020/FFF8E7',
     content: [
       'With over a decade of experience in luxury event planning, we specialize in creating extraordinary moments that leave lasting impressions. Our team of dedicated professionals brings creativity, attention to detail, and unparalleled service to every event we plan.',
       'From intimate weddings to grand corporate galas, we transform visions into reality, ensuring every detail is meticulously crafted and every moment is perfectly orchestrated.',
@@ -18,7 +18,7 @@ const contentBlocks = [
   {
     id: 'philosophy',
     heading: 'Our Philosophy',
-    image: 'https://dummyimage.com/600x800/4B2E2A/FFF8E7&text=Philosophy',
+    image: 'https://dummyimage.com/600x800/4B2E2A/FFF8E7',
     content: [
       'We believe that every event tells a story, and our role is to bring that narrative to life with elegance and precision. Our approach combines timeless sophistication with modern innovation, creating experiences that resonate deeply with our clients and their guests.',
       'Excellence is not a destination but a journey. We continuously refine our craft, staying ahead of trends while honoring the classic principles of luxury event design.',
@@ -27,7 +27,7 @@ const contentBlocks = [
   {
     id: 'signature-style',
     heading: 'Signature Style',
-    image: 'https://dummyimage.com/600x800/800020/FFF8E7&text=Style',
+    image: 'https://dummyimage.com/600x800/800020/FFF8E7',
     content: [
       'Our signature style is defined by an unwavering commitment to perfection and an intuitive understanding of what makes moments truly unforgettable. We blend artistic vision with meticulous execution, creating seamless experiences that feel effortless yet extraordinary.',
       'Every detail matters—from the grandest gesture to the smallest touch. This philosophy has earned us recognition as leaders in luxury event planning, trusted by discerning clients who demand nothing but the best.',
