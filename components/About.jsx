@@ -361,27 +361,42 @@ export default function About() {
                   // Calculate target progress (0 to 1)
                   const targetProgress = index / contentBlocks.length
                   
-                  // Get the section's position
-                  const sectionTop = sectionRef.current.offsetTop
-                  const sectionHeight = sectionRef.current.offsetHeight
+                  // Find the ScrollTrigger instance for this section
+                  const allTriggers = ScrollTrigger.getAll()
+                  const sectionTrigger = allTriggers.find(st => st.vars.trigger === sectionRef.current)
                   
-                  // Calculate scroll position
-                  // The section is pinned, so we need to account for that
-                  const totalScrollDistance = 500 // vh
-                  const viewportHeight = window.innerHeight
-                  const totalScrollPixels = (totalScrollDistance / 100) * viewportHeight
-                  
-                  // Target scroll position within the pinned section
-                  const targetScrollInSection = targetProgress * totalScrollPixels
-                  
-                  // Final scroll position = section top + target scroll within section
-                  const targetScroll = sectionTop + targetScrollInSection
-                  
-                  // Scroll to target position
-                  window.scrollTo({
-                    top: targetScroll,
-                    behavior: 'smooth'
-                  })
+                  if (sectionTrigger) {
+                    // Get the start and end positions of the ScrollTrigger
+                    const start = sectionTrigger.start
+                    const end = sectionTrigger.end
+                    const totalDistance = end - start
+                    
+                    // Calculate target scroll position
+                    const targetScroll = start + (totalDistance * targetProgress)
+                    
+                    // Use GSAP's scrollTo for smoother scrolling that works with ScrollTrigger
+                    gsap.to(window, {
+                      duration: 1,
+                      scrollTo: {
+                        y: targetScroll,
+                        autoKill: false
+                      },
+                      ease: 'power2.inOut'
+                    })
+                  } else {
+                    // Fallback: calculate manually
+                    const sectionTop = sectionRef.current.offsetTop
+                    const totalScrollDistance = 500 // vh
+                    const viewportHeight = window.innerHeight
+                    const totalScrollPixels = (totalScrollDistance / 100) * viewportHeight
+                    const targetScrollInSection = targetProgress * totalScrollPixels
+                    const targetScroll = sectionTop + targetScrollInSection
+                    
+                    window.scrollTo({
+                      top: targetScroll,
+                      behavior: 'smooth'
+                    })
+                  }
                 }
                 
                 return (
