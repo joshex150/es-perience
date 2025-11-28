@@ -374,14 +374,10 @@ export default function About() {
                     // Calculate target scroll position
                     const targetScroll = start + (totalDistance * targetProgress)
                     
-                    // Use GSAP's scrollTo for smoother scrolling that works with ScrollTrigger
-                    gsap.to(window, {
-                      duration: 1,
-                      scrollTo: {
-                        y: targetScroll,
-                        autoKill: false
-                      },
-                      ease: 'power2.inOut'
+                    // Scroll to target position using smooth scroll
+                    window.scrollTo({
+                      top: targetScroll,
+                      behavior: 'smooth'
                     })
                   } else {
                     // Fallback: calculate manually
