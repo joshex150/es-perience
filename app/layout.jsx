@@ -185,25 +185,25 @@ export default function RootLayout({ children }) {
                 }
                 
                 // Force scroll to top immediately
-                window.scrollTo(0, 0);
+                // window.scrollTo(0, 0);
                 
                 // Also force scroll to top after a short delay to catch any late scrolls
                 setTimeout(function() {
-                  window.scrollTo(0, 0);
+                  // window.scrollTo(0, 0);
                 }, 0);
                 
                 // Force scroll to top on page load
                 window.addEventListener('load', function() {
-                  window.scrollTo(0, 0);
+                  // window.scrollTo(0, 0);
                 }, { once: true });
                 
                 // Force scroll to top on DOMContentLoaded
                 if (document.readyState === 'loading') {
                   document.addEventListener('DOMContentLoaded', function() {
-                    window.scrollTo(0, 0);
+                    // window.scrollTo(0, 0);
                   }, { once: true });
                 } else {
-                  window.scrollTo(0, 0);
+                  // window.scrollTo(0, 0);
                 }
               })();
             `,
