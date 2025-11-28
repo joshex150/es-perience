@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import Image from 'next/image'
@@ -17,8 +18,11 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('home')
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+    
     // Prevent scroll restoration on page load
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual'
@@ -211,139 +215,145 @@ export default function Header() {
             </div>
           </motion.button>
         </div>
-
-        {/* Mobile Menu Backdrop */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <motion.div
-              key="backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-md z-[60]"
-              style={{ top: '80px' }}
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
-          )}
-        </AnimatePresence>
-
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <motion.div
-              key="menu"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ 
-                duration: 0.35, 
-                ease: [0.25, 0.46, 0.45, 0.94]
-              }}
-              className="md:hidden fixed inset-x-0 bottom-0 z-[70] overflow-y-auto"
-              style={{ top: '80px' }}
-            >
-              <div className="h-full bg-gradient-to-b from-cream via-cream to-cream/98 backdrop-blur-2xl">
-                {/* Menu Header */}
-                <div className="px-6 pt-8 pb-6 border-b border-burgundy/10">
-                  <h2 className="text-xl font-cursive text-coffee-brown mb-1">Navigation</h2>
-                  <p className="text-sm text-coffee-brown/60">Explore our services</p>
-                </div>
-
-                {/* Menu Items */}
-                <div className="px-4 py-6 space-y-1">
-                  {navLinks.map((link, index) => {
-                    const sectionId = link.href.substring(1)
-                    const isActive = activeSection === sectionId
-                    
-                    return (
-                      <motion.div
-                        key={link.name}
-                        initial={{ opacity: 0, x: -30 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ 
-                          delay: index * 0.05,
-                          duration: 0.4,
-                          ease: [0.25, 0.46, 0.45, 0.94]
-                        }}
-                      >
-                        <motion.a
-                          href={link.href}
-                          onClick={(e) => handleLinkClick(e, link.href)}
-                          className={`relative flex items-center justify-between px-5 py-4 rounded-2xl font-medium text-base transition-all duration-300 group ${
-                            isActive
-                              ? 'text-burgundy bg-burgundy/10 shadow-sm'
-                              : 'text-coffee-brown hover:text-burgundy hover:bg-burgundy/5 active:bg-burgundy/8'
-                          }`}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <span className="relative z-10">{link.name}</span>
-                          {isActive && (
-                            <motion.div
-                              className="absolute inset-0 bg-burgundy/8 rounded-2xl border border-burgundy/20"
-                              layoutId="mobileActiveBg"
-                              initial={false}
-                              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                            />
-                          )}
-                          {isActive && (
-                            <motion.div
-                              className="w-2 h-2 rounded-full bg-burgundy"
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ delay: 0.1 }}
-                            />
-                          )}
-                          {!isActive && (
-                            <motion.div
-                              className="w-1.5 h-1.5 rounded-full bg-coffee-brown/20 group-hover:bg-burgundy/30"
-                              transition={{ duration: 0.2 }}
-                            />
-                          )}
-                        </motion.a>
-                      </motion.div>
-                    )
-                  })}
-                </div>
-
-                {/* Divider */}
-                <div className="px-6 py-4">
-                  <div className="h-px bg-gradient-to-r from-transparent via-burgundy/20 to-transparent" />
-                </div>
-
-                {/* CTA Button */}
-                <div className="px-4 pb-8 pt-2">
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ 
-                      delay: navLinks.length * 0.05 + 0.1,
-                      duration: 0.4,
-                      ease: [0.25, 0.46, 0.45, 0.94]
-                    }}
-                  >
-                    <motion.a
-                      href="#contact"
-                      onClick={(e) => handleLinkClick(e, '#contact')}
-                      className="block w-full px-8 py-4 bg-gradient-to-r from-burgundy to-burgundy/90 text-cream rounded-2xl font-semibold text-center shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden group"
-                      whileTap={{ scale: 0.97 }}
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      <span className="relative z-10">Get Started</span>
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-burgundy/90 to-burgundy"
-                        initial={{ x: '-100%' }}
-                        whileHover={{ x: 0 }}
-                        transition={{ duration: 0.3 }}
-                      />
-                    </motion.a>
-                  </motion.div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </nav>
+
+      {/* Mobile Menu - Rendered via Portal to body */}
+      {mounted && createPortal(
+        <>
+          {/* Mobile Menu Backdrop */}
+          <AnimatePresence>
+            {isMobileMenuOpen && (
+              <motion.div
+                key="backdrop"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+                className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-md"
+                style={{ top: '80px', zIndex: 9998 }}
+                onClick={() => setIsMobileMenuOpen(false)}
+              />
+            )}
+          </AnimatePresence>
+
+          {/* Mobile Menu */}
+          <AnimatePresence>
+            {isMobileMenuOpen && (
+              <motion.div
+                key="menu"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ 
+                  duration: 0.35, 
+                  ease: [0.25, 0.46, 0.45, 0.94]
+                }}
+                className="md:hidden fixed inset-x-0 bottom-0 overflow-y-auto"
+                style={{ top: '80px', zIndex: 9999 }}
+              >
+                <div className="h-full bg-gradient-to-b from-cream via-cream to-cream/98 backdrop-blur-2xl">
+                  {/* Menu Header */}
+                  <div className="px-6 pt-8 pb-6 border-b border-burgundy/10">
+                    <h2 className="text-xl font-cursive text-coffee-brown mb-1">Navigation</h2>
+                    <p className="text-sm text-coffee-brown/60">Explore our services</p>
+                  </div>
+
+                  {/* Menu Items */}
+                  <div className="px-4 py-6 space-y-1">
+                    {navLinks.map((link, index) => {
+                      const sectionId = link.href.substring(1)
+                      const isActive = activeSection === sectionId
+                      
+                      return (
+                        <motion.div
+                          key={link.name}
+                          initial={{ opacity: 0, x: -30 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ 
+                            delay: index * 0.05,
+                            duration: 0.4,
+                            ease: [0.25, 0.46, 0.45, 0.94]
+                          }}
+                        >
+                          <motion.a
+                            href={link.href}
+                            onClick={(e) => handleLinkClick(e, link.href)}
+                            className={`relative flex items-center justify-between px-5 py-4 rounded-2xl font-medium text-base transition-all duration-300 group ${
+                              isActive
+                                ? 'text-burgundy bg-burgundy/10 shadow-sm'
+                                : 'text-coffee-brown hover:text-burgundy hover:bg-burgundy/5 active:bg-burgundy/8'
+                            }`}
+                            whileTap={{ scale: 0.98 }}
+                          >
+                            <span className="relative z-10">{link.name}</span>
+                            {isActive && (
+                              <motion.div
+                                className="absolute inset-0 bg-burgundy/8 rounded-2xl border border-burgundy/20"
+                                layoutId="mobileActiveBg"
+                                initial={false}
+                                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                              />
+                            )}
+                            {isActive && (
+                              <motion.div
+                                className="w-2 h-2 rounded-full bg-burgundy"
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ delay: 0.1 }}
+                              />
+                            )}
+                            {!isActive && (
+                              <motion.div
+                                className="w-1.5 h-1.5 rounded-full bg-coffee-brown/20 group-hover:bg-burgundy/30"
+                                transition={{ duration: 0.2 }}
+                              />
+                            )}
+                          </motion.a>
+                        </motion.div>
+                      )
+                    })}
+                  </div>
+
+                  {/* Divider */}
+                  <div className="px-6 py-4">
+                    <div className="h-px bg-gradient-to-r from-transparent via-burgundy/20 to-transparent" />
+                  </div>
+
+                  {/* CTA Button */}
+                  <div className="px-4 pb-8 pt-2">
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ 
+                        delay: navLinks.length * 0.05 + 0.1,
+                        duration: 0.4,
+                        ease: [0.25, 0.46, 0.45, 0.94]
+                      }}
+                    >
+                      <motion.a
+                        href="#contact"
+                        onClick={(e) => handleLinkClick(e, '#contact')}
+                        className="block w-full px-8 py-4 bg-gradient-to-r from-burgundy to-burgundy/90 text-cream rounded-2xl font-semibold text-center shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden group"
+                        whileTap={{ scale: 0.97 }}
+                        whileHover={{ scale: 1.02 }}
+                      >
+                        <span className="relative z-10">Get Started</span>
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-r from-burgundy/90 to-burgundy"
+                          initial={{ x: '-100%' }}
+                          whileHover={{ x: 0 }}
+                          transition={{ duration: 0.3 }}
+                        />
+                      </motion.a>
+                    </motion.div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>,
+        document.body
+      )}
     </motion.header>
   )
 }
