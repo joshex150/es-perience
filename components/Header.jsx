@@ -213,13 +213,14 @@ export default function Header() {
         </div>
 
         {/* Mobile Menu Backdrop */}
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {isMobileMenuOpen && (
             <motion.div
+              key="backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
               className="md:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-40 top-20"
               onClick={() => setIsMobileMenuOpen(false)}
             />
@@ -227,17 +228,22 @@ export default function Header() {
         </AnimatePresence>
 
         {/* Mobile Menu */}
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {isMobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              key="menu"
+              initial={{ opacity: 0, y: -10, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+              exit={{ opacity: 0, y: -10, scale: 0.98 }}
+              transition={{ 
+                duration: 0.25, 
+                ease: [0.4, 0, 0.2, 1],
+                opacity: { duration: 0.2 }
+              }}
               className="md:hidden relative z-50 mt-3"
             >
               <div className="bg-cream/98 backdrop-blur-xl rounded-2xl shadow-2xl border-2 border-burgundy/20 overflow-hidden">
-                <div className="py-3 px-2">
+                <div className="py-3 px-2 pb-4">
                   {navLinks.map((link, index) => {
                     const sectionId = link.href.substring(1)
                     const isActive = activeSection === sectionId
@@ -252,13 +258,12 @@ export default function Header() {
                             ? 'text-burgundy bg-burgundy/15 shadow-md'
                             : 'text-coffee-brown hover:text-burgundy hover:bg-burgundy/8 active:bg-burgundy/12'
                         }`}
-                        initial={{ opacity: 0, x: -30 }}
+                        initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ 
-                          delay: index * 0.08,
-                          type: 'spring',
-                          stiffness: 300,
-                          damping: 25
+                          delay: index * 0.06,
+                          duration: 0.3,
+                          ease: 'easeOut'
                         }}
                         whileTap={{ scale: 0.97 }}
                       >
@@ -275,14 +280,13 @@ export default function Header() {
                     )
                   })}
                   <motion.div
-                    className="px-2 pt-4 pb-2"
+                    className="px-2 pt-4"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ 
-                      delay: navLinks.length * 0.08 + 0.1,
-                      type: 'spring',
-                      stiffness: 300,
-                      damping: 25
+                      delay: navLinks.length * 0.06 + 0.05,
+                      duration: 0.3,
+                      ease: 'easeOut'
                     }}
                   >
                     <motion.a
