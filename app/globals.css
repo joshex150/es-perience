@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Space+Mono:wght@400;700&family=JetBrains+Mono:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Quinoa Text SC Font Face - Commented out until font files are added to /public/fonts/ */
+/* Uncomment and add font files when available:
+@font-face {
+  font-family: 'Quinoa Text SC';
+  src: url('/fonts/QuinoaTextSC-Regular.woff2') format('woff2'),
+       url('/fonts/QuinoaTextSC-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Quinoa Text SC';
+  src: url('/fonts/QuinoaTextSC-Bold.woff2') format('woff2'),
+       url('/fonts/QuinoaTextSC-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* Account for fixed header */
+}
+
+body {
+  background-color: #FFF8E7;
+  color: #4B2E2A;
+  font-family: 'Quinoa Text SC', 'Inter', sans-serif;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'JetBrains Mono', 'Space Mono', monospace;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+}
+
+/* Skip to main content link for accessibility */
+.skip-to-main {
+  position: absolute;
+  left: -9999px;
+  z-index: 999;
+}
+
+.skip-to-main:focus {
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1rem 2rem;
+  background: #800020;
+  color: #FFF8E7;
+  text-decoration: none;
+  border-radius: 0.5rem;
+}
+
+/* Focus visible styles for better accessibility */
+*:focus-visible {
+  outline: 2px solid #800020;
+  outline-offset: 2px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom Scrollbar Styles */
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFF8E7;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #800020;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6B0019;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #800020 #FFF8E7;
+}
+
+/* Input Placeholder Styles - Ash/Gray Color */
+::placeholder {
+  color: #9CA3AF;
+}
+
+::-webkit-input-placeholder {
+  color: #9CA3AF;
+}
+
+::-moz-placeholder {
+  color: #9CA3AF;
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: #9CA3AF;
+}
+
+:-moz-placeholder {
+  color: #9CA3AF;
+  opacity: 1;
+}
+
+/* Select Element Styling - Match Input Fields */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234B2E2A' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 12px;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+select:focus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23800020' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+}
+
+select option {
+  background-color: #FFF8E7;
+  color: #4B2E2A;
+  padding: 0.5rem;
+}
