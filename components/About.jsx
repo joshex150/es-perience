@@ -134,8 +134,12 @@ export default function About() {
           onUpdate: (self) => {
             // Update active block based on scroll progress
             const progress = self.progress
-            const blockProgress = progress * totalBlocks
-            const currentBlock = Math.min(Math.floor(blockProgress), totalBlocks - 1)
+            const totalBlockProgress = progress * totalBlocks
+            const currentBlock = Math.min(Math.floor(totalBlockProgress), totalBlocks - 1)
+            
+            // Calculate progress within the current block (0-1)
+            const progressInBlock = (totalBlockProgress - currentBlock) % 1
+            const normalizedBlockProgress = progressInBlock < 0 ? 0 : progressInBlock
             
             // Only update state if block changed to prevent excessive re-renders
             if (previousBlockRef.current !== currentBlock) {
@@ -143,10 +147,16 @@ export default function About() {
               setActiveBlock(currentBlock)
             }
             
-            // Update progress bar directly (no state update needed)
+            // Update block progress if it changed significantly (throttle updates)
+            if (Math.abs(previousProgressRef.current - normalizedBlockProgress) > 0.01) {
+              previousProgressRef.current = normalizedBlockProgress
+              setBlockProgress(normalizedBlockProgress)
+            }
+            
+            // Update progress bar directly with smooth animation
             if (progressBarRef.current) {
-              const progressPercent = (progress * 100)
-              progressBarRef.current.style.width = `${Math.min(progressPercent, 100)}%`
+              const progressPercent = Math.min(progress * 100, 100)
+              progressBarRef.current.style.width = `${progressPercent}%`
             }
           },
         },
@@ -276,19 +286,30 @@ export default function About() {
           <div className="flex items-center space-x-3 bg-cream/95 backdrop-blur-md px-6 py-3 rounded-full shadow-xl border border-burgundy/20">
             {/* Progress Dots */}
             <div className="flex items-center space-x-2">
-              {contentBlocks.map((block, index) => (
-                <div
-                  key={block.id}
-                  className={`relative transition-all duration-300 ${
-                    activeBlock === index
-                      ? 'w-8 bg-burgundy'
-                      : 'w-2 bg-coffee-brown/30'
-                  } h-2 rounded-full`}
-                  aria-label={block.heading}
-                >
-                  <span className="sr-only">{block.heading}</span>
-                </div>
-              ))}
+              {contentBlocks.map((block, index) => {
+                const isActive = activeBlock === index
+                const isNext = activeBlock === index - 1 && blockProgress > 0.5
+                const dotWidth = isActive 
+                  ? 8 + (blockProgress * 24) // Expand from 8px to 32px based on progress
+                  : isNext 
+                    ? 2 + (blockProgress * 6) // Slightly expand next dot
+                    : 2
+                
+                return (
+                  <div
+                    key={block.id}
+                    className={`relative transition-all duration-100 ${
+                      isActive
+                        ? 'bg-burgundy'
+                        : 'bg-coffee-brown/30'
+                    } h-2 rounded-full`}
+                    style={{ width: `${dotWidth * 4}px` }}
+                    aria-label={block.heading}
+                  >
+                    <span className="sr-only">{block.heading}</span>
+                  </div>
+                )
+              })}
             </div>
             
             {/* Progress Bar */}
