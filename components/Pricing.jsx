@@ -71,6 +71,19 @@ export default function Pricing() {
     },
   }
 
+  const highlightedVariants = {
+    hidden: { opacity: 0, y: 50, scale: 1 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1.05,
+      transition: {
+        duration: 0.6,
+        ease: 'easeOut',
+      },
+    },
+  }
+
   return (
     <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-cream">
       <div className="max-w-7xl mx-auto">
@@ -98,12 +111,12 @@ export default function Pricing() {
           {packages.map((pkg, index) => (
             <motion.div
               key={index}
-              variants={itemVariants}
+              variants={pkg.highlighted ? highlightedVariants : itemVariants}
               className={`bg-cream border-2 rounded-lg p-8 flex flex-col h-full ${
                 pkg.highlighted
-                  ? 'border-burgundy shadow-2xl scale-105'
+                  ? 'border-burgundy shadow-2xl'
                   : 'border-burgundy/20 hover:border-burgundy/40'
-              } transition-all duration-300`}
+              } transition-colors duration-300`}
             >
               <h3 className="text-2xl text-coffee-brown mb-2">
                 {pkg.name}
