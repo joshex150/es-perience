@@ -98,13 +98,13 @@ This document outlines all SEO optimizations implemented in The Es-Perience webs
 ### Environment Variables
 Add these to your `.env.local`:
 ```env
-NEXT_PUBLIC_SITE_URL=https://theesperience.com
+NEXT_PUBLIC_SITE_URL=https://es-perience.vercel.app
 ```
 
 ### Google Search Console
 1. Add property in Google Search Console
 2. Verify ownership
-3. Submit sitemap: `https://theesperience.com/sitemap.xml`
+3. Submit sitemap: `https://es-perience.vercel.app/sitemap.xml`
 4. Monitor performance
 
 ### Google Analytics

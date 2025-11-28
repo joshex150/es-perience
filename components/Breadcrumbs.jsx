@@ -11,7 +11,7 @@ export default function Breadcrumbs() {
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: process.env.NEXT_PUBLIC_SITE_URL || 'https://theesperience.com',
+        item: process.env.NEXT_PUBLIC_SITE_URL || 'https://es-perience.vercel.app',
       },
     ],
   }

@@ -1,5 +1,5 @@
 export default function sitemap() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://theesperience.com'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://es-perience.vercel.app'
   
   const routes = [
     {

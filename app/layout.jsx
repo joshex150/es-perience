@@ -1,7 +1,7 @@
 import './globals.css'
 import Script from 'next/script'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://theesperience.com'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://es-perience.vercel.app'
 const siteName = 'The Es-Perience'
 const siteDescription = 'The Es-Perience - Luxury event planning for weddings, corporate functions, and celebrations. Award-winning event planners creating unforgettable experiences with exquisite attention to detail.'
 
