@@ -86,7 +86,7 @@ export default function RootLayout({ children }) {
     name: siteName,
     description: siteDescription,
     url: siteUrl,
-    logo: `${siteUrl}/logo.png`,
+    logo: `${siteUrl}/og-image.png`,
     image: `${siteUrl}/og-image.jpg`,
     telephone: '+1-123-456-7890',
     email: 'info@theesperience.com',
