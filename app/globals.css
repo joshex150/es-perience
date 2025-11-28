@@ -171,12 +171,16 @@ input[type="date"] {
   box-sizing: border-box;
   -webkit-appearance: none;
   -moz-appearance: textfield;
+  min-height: 48px; /* Match other input fields height (py-3 = 12px top + 12px bottom + line-height) */
+  height: auto;
+  line-height: 1.5;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
   padding: 0.25rem;
   margin-left: 0.5rem;
+  height: 100%;
 }
 
 input[type="date"]::-webkit-inner-spin-button,
