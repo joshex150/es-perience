@@ -24,10 +24,24 @@ export default function Header() {
       window.history.scrollRestoration = 'manual'
     }
 
-    // Ensure page starts at top on load
-    if (window.scrollY > 0) {
-      window.scrollTo({ top: 0, behavior: 'instant' })
+    // Aggressively force scroll to top on mount - multiple attempts to catch all cases
+    const forceScrollToTop = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+      document.documentElement.scrollTop = 0
+      document.body.scrollTop = 0
     }
+
+    // Force immediately
+    forceScrollToTop()
+
+    // Force after a microtask delay
+    setTimeout(forceScrollToTop, 0)
+
+    // Force after a short delay
+    setTimeout(forceScrollToTop, 10)
+
+    // Force after React hydration
+    setTimeout(forceScrollToTop, 100)
 
     // Set initial section to home
     setActiveSection('home')

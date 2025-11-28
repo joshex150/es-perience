@@ -48,6 +48,11 @@ export default function About() {
   const previousProgressRef = useRef(0) // To optimize blockProgress updates
 
   useEffect(() => {
+    // Ensure we're at the top before initializing GSAP to prevent scroll issues
+    if (window.scrollY > 0) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+    }
+
     // Register ScrollTrigger plugin
     gsap.registerPlugin(ScrollTrigger)
 
