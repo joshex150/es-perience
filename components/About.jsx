@@ -42,8 +42,10 @@ export default function About() {
   const imageRefs = useRef([])
   const textBlockRefs = useRef([])
   const [activeBlock, setActiveBlock] = useState(0)
+  const [blockProgress, setBlockProgress] = useState(0) // Progress within current block (0-1)
   const progressBarRef = useRef(null)
-  const previousBlockRef = useRef(0)
+  const previousBlockRef = useRef(0) // To optimize setActiveBlock updates
+  const previousProgressRef = useRef(0) // To optimize blockProgress updates
 
   useEffect(() => {
     // Register ScrollTrigger plugin
