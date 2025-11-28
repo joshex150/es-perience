@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -41,6 +41,9 @@ export default function About() {
   const textContainerRef = useRef(null)
   const imageRefs = useRef([])
   const textBlockRefs = useRef([])
+  const [activeBlock, setActiveBlock] = useState(0)
+  const progressBarRef = useRef(null)
+  const previousBlockRef = useRef(0)
 
   useEffect(() => {
     // Register ScrollTrigger plugin
@@ -57,49 +60,66 @@ export default function About() {
     // Check if mobile (no GSAP on mobile)
     const isMobile = window.innerWidth < 768
 
-    // Mobile: Ensure first image is visible
-    if (isMobile && images[0]) {
-      // Force first image to be visible on mobile
-      const firstImage = images[0]
-      if (firstImage) {
-        firstImage.style.opacity = '1'
-        firstImage.style.display = 'block'
-        firstImage.style.position = 'relative'
-        firstImage.style.visibility = 'visible'
-      }
-      
-      // Hide other images on mobile
+    if (isMobile) {
+      // Mobile: Ensure first image is visible using CSS only
+      // Wait a bit for DOM to be ready
+      setTimeout(() => {
+        if (images[0]) {
+          const imgElement = images[0]
+          imgElement.style.cssText = 'opacity: 1 !important; display: block !important; position: relative !important; visibility: visible !important; z-index: 10 !important;'
+          
+          // Also ensure the parent container is visible
+          if (imageContainer) {
+            imageContainer.style.cssText = 'display: block !important; visibility: visible !important;'
+          }
+        }
+        
+        // Hide other images on mobile
+        for (let i = 1; i < images.length; i++) {
+          if (images[i]) {
+            images[i].style.cssText = 'opacity: 0 !important; display: none !important; visibility: hidden !important;'
+          }
+        }
+      }, 100)
+    } else {
+      // Desktop: Set initial states for GSAP
+      // Hide all images except first one
       for (let i = 1; i < images.length; i++) {
         if (images[i]) {
-          images[i].style.opacity = '0'
-          images[i].style.display = 'none'
-          images[i].style.visibility = 'hidden'
+          gsap.set(images[i], {
+            opacity: 0,
+            scale: 1.1,
+            filter: 'blur(10px)',
+            immediateRender: true,
+          })
         }
       }
-    }
 
-    // Only run GSAP animations on desktop
-    if (!isMobile) {
-      // Set initial states for desktop
-      gsap.set(images, {
-        opacity: 0,
-        scale: 1.1,
-        filter: 'blur(10px)',
-      })
+      // Hide all text blocks except first one
+      for (let i = 1; i < textBlocks.length; i++) {
+        if (textBlocks[i]) {
+          gsap.set(textBlocks[i], {
+            opacity: 0,
+            y: 40,
+            filter: 'blur(8px)',
+            immediateRender: true,
+          })
+        }
+      }
 
-      gsap.set(textBlocks, {
-        opacity: 0,
-        y: 40,
-        filter: 'blur(8px)',
-      })
+      // Show first image and text block on desktop immediately
+      if (images[0] && textBlocks[0]) {
+        gsap.set([images[0], textBlocks[0]], {
+          opacity: 1,
+          scale: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          immediateRender: true,
+        })
+      }
 
-      // Show first image and text block
-      gsap.set([images[0], textBlocks[0]], {
-        opacity: 1,
-        scale: 1,
-        y: 0,
-        filter: 'blur(0px)',
-      })
+      // Animate each block with equal scroll distance
+      const totalBlocks = contentBlocks.length
 
       // Create main timeline with ScrollTrigger (desktop only)
       const tl = gsap.timeline({
@@ -111,11 +131,26 @@ export default function About() {
           pin: true,
           anticipatePin: 1,
           pinSpacing: true,
+          onUpdate: (self) => {
+            // Update active block based on scroll progress
+            const progress = self.progress
+            const blockProgress = progress * totalBlocks
+            const currentBlock = Math.min(Math.floor(blockProgress), totalBlocks - 1)
+            
+            // Only update state if block changed to prevent excessive re-renders
+            if (previousBlockRef.current !== currentBlock) {
+              previousBlockRef.current = currentBlock
+              setActiveBlock(currentBlock)
+            }
+            
+            // Update progress bar directly (no state update needed)
+            if (progressBarRef.current) {
+              const progressPercent = (progress * 100)
+              progressBarRef.current.style.width = `${Math.min(progressPercent, 100)}%`
+            }
+          },
         },
       })
-
-      // Animate each block with equal scroll distance
-      const totalBlocks = contentBlocks.length
       const scrollPerBlock = 1 / totalBlocks // Each block gets equal scroll distance
 
       contentBlocks.forEach((block, index) => {
@@ -126,22 +161,29 @@ export default function About() {
         const transitionDuration = scrollPerBlock * 0.25 // Transition takes 25% of block time
 
         if (index === 0) {
-          // First block: smoothly set initial state
-          gsap.set([textBlocks[0], images[0]], {
-            opacity: 1,
-            scale: 1,
-            y: 0,
-            filter: 'blur(0px)',
-          })
+          // First block: ensure it's visible from the start
+          // Set first image and text block to be visible immediately
+          if (images[0] && textBlocks[0]) {
+            gsap.set([textBlocks[0], images[0]], {
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              filter: 'blur(0px)',
+              immediateRender: true,
+            })
+          }
 
           // Ensure all other blocks are completely hidden (set before timeline)
           for (let i = 1; i < totalBlocks; i++) {
-            gsap.set([textBlocks[i], images[i]], {
-              opacity: 0,
-              y: 20,
-              scale: 1.02,
-              filter: 'blur(6px)',
-            })
+            if (textBlocks[i] && images[i]) {
+              gsap.set([textBlocks[i], images[i]], {
+                opacity: 0,
+                y: 20,
+                scale: 1.02,
+                filter: 'blur(6px)',
+                immediateRender: true,
+              })
+            }
           }
         }
 
@@ -226,14 +268,44 @@ export default function About() {
     <section
       id="about"
       ref={sectionRef}
-      className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-cream relative overflow-hidden"
+      className="py-6 sm:py-16 px-4 sm:px-6 lg:px-8 bg-cream relative overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto lg:h-screen lg:max-h-[100vh] lg:flex lg:items-center py-8 lg:py-0">
+      <div className="max-w-7xl mx-auto lg:h-screen lg:max-h-[100vh] lg:flex lg:items-center py-8 lg:py-0 relative">
+        {/* Progress Indicator - Desktop Only, Static Position */}
+        <div className="hidden lg:flex absolute bottom-20 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
+          <div className="flex items-center space-x-3 bg-cream/95 backdrop-blur-md px-6 py-3 rounded-full shadow-xl border border-burgundy/20">
+            {/* Progress Dots */}
+            <div className="flex items-center space-x-2">
+              {contentBlocks.map((block, index) => (
+                <div
+                  key={block.id}
+                  className={`relative transition-all duration-300 ${
+                    activeBlock === index
+                      ? 'w-8 bg-burgundy'
+                      : 'w-2 bg-coffee-brown/30'
+                  } h-2 rounded-full`}
+                  aria-label={block.heading}
+                >
+                  <span className="sr-only">{block.heading}</span>
+                </div>
+              ))}
+            </div>
+            
+            {/* Progress Bar */}
+            <div className="hidden xl:block w-32 h-1 bg-coffee-brown/20 rounded-full overflow-hidden ml-4">
+              <div
+                ref={progressBarRef}
+                className="h-full bg-burgundy rounded-full transition-all duration-300"
+                style={{ width: '0%' }}
+              />
+            </div>
+          </div>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start lg:items-center w-full overflow-hidden">
           {/* Left Side - Swappable Images */}
           <div
             ref={imageContainerRef}
-            className="relative h-[400px] sm:h-[500px] lg:h-[600px] order-2 lg:order-1 lg:flex-shrink-0"
+            className="relative h-[400px] sm:h-[500px] lg:h-[600px] order-2 lg:order-1 lg:flex-shrink-0 w-full"
           >
             {contentBlocks.map((block, index) => (
               <div
@@ -243,12 +315,16 @@ export default function About() {
                 }}
                 className={`${
                   index === 0 
-                    ? 'opacity-100 block relative z-10' 
+                    ? 'opacity-100 block relative z-10 w-full h-full lg:opacity-100' 
                     : 'opacity-0 hidden lg:opacity-0'
                 } lg:absolute lg:inset-0 lg:block lg:z-0`}
-                style={index === 0 ? { position: 'relative' } : undefined}
+                style={index === 0 ? {
+                  width: '100%',
+                  height: '100%',
+                  minHeight: '400px',
+                } : undefined}
               >
-                <div className="relative w-full h-full rounded-lg overflow-hidden shadow-2xl">
+                <div className="relative w-full h-full rounded-lg overflow-hidden shadow-2xl" style={{ width: '100%', height: '100%', minHeight: 'inherit' }}>
                   <Image
                     src={block.image}
                     alt={`${block.heading} - The Es-Perience`}
@@ -256,6 +332,8 @@ export default function About() {
                     className="object-cover"
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     loading={index === 0 ? 'eager' : 'lazy'}
+                    priority={index === 0}
+                    unoptimized={false}
                   />
                 </div>
               </div>
