@@ -8,6 +8,11 @@ const nextConfig = {
         hostname: 'placehold.co',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'es-perience.vercel.app',
+        pathname: '/**',
+      },
     ],
     // Disable image optimization in development to avoid connection issues
     unoptimized: process.env.NODE_ENV === 'development',
