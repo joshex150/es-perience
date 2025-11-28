@@ -206,18 +206,23 @@ export default function About() {
           },
         },
       })
-      const scrollPerBlock = 1 / totalBlocks // Each block gets equal scroll distance
+      // Each block gets exactly equal scroll distance
+      const scrollPerBlock = 1 / totalBlocks
+      const transitionDuration = scrollPerBlock * 0.2 // Transition takes 20% of block time
 
       contentBlocks.forEach((block, index) => {
-        // Calculate progress points for equal distribution
+        // Calculate exact progress points for equal distribution
+        // Each block occupies exactly 1/totalBlocks of the scroll distance
         const blockStart = index * scrollPerBlock
         const blockEnd = (index + 1) * scrollPerBlock
-        const transitionStart = blockStart + scrollPerBlock * 0.75 // Start transition at 75% through block
-        const transitionDuration = scrollPerBlock * 0.25 // Transition takes 25% of block time
+        
+        // Transition starts at 80% through current block, ends at 20% of next block
+        // This ensures equal spacing: 80% visible + 20% transition = 100% of block
+        const transitionStart = blockStart + scrollPerBlock * 0.8
+        const transitionEnd = blockEnd
 
         if (index === 0) {
           // First block: ensure it's visible from the start
-          // Set first image and text block to be visible immediately
           if (images[0] && textBlocks[0]) {
             gsap.set([textBlocks[0], images[0]], {
               opacity: 1,
@@ -228,7 +233,7 @@ export default function About() {
             })
           }
 
-          // Ensure all other blocks are completely hidden (set before timeline)
+          // Ensure all other blocks are completely hidden
           for (let i = 1; i < totalBlocks; i++) {
             if (textBlocks[i] && images[i]) {
               gsap.set([textBlocks[i], images[i]], {
@@ -245,9 +250,9 @@ export default function About() {
         if (index > 0) {
           const prevIndex = index - 1
           const prevBlockStart = prevIndex * scrollPerBlock
-          const prevTransitionStart = prevBlockStart + scrollPerBlock * 0.75
+          const prevTransitionStart = prevBlockStart + scrollPerBlock * 0.8
 
-          // Smooth fade out previous content - no abrupt stops
+          // Fade out previous content at the exact transition point
           tl.to(
             [textBlocks[prevIndex], images[prevIndex]],
             {
@@ -255,13 +260,13 @@ export default function About() {
               y: -20,
               scale: 0.99,
               filter: 'blur(6px)',
-              duration: transitionDuration * 0.6,
+              duration: transitionDuration,
               ease: 'sine.inOut',
             },
             prevTransitionStart
           )
 
-          // Smooth fade in current content - overlapping slightly for seamless transition
+          // Fade in current content simultaneously
           tl.fromTo(
             [textBlocks[index], images[index]],
             {
@@ -275,13 +280,13 @@ export default function About() {
               y: 0,
               scale: 1,
               filter: 'blur(0px)',
-              duration: transitionDuration * 0.8,
+              duration: transitionDuration,
               ease: 'sine.out',
             },
-            prevTransitionStart + transitionDuration * 0.1
+            prevTransitionStart
           )
 
-          // Keep current content stable - use to() instead of set() for smoother hold
+          // Keep current content visible for the rest of its block duration
           tl.to(
             [textBlocks[index], images[index]],
             {
@@ -289,13 +294,13 @@ export default function About() {
               scale: 1,
               y: 0,
               filter: 'blur(0px)',
-              duration: transitionDuration * 0.1,
+              duration: scrollPerBlock * 0.8 - transitionDuration,
               ease: 'none',
             },
-            prevTransitionStart + transitionDuration * 0.9
+            prevTransitionStart + transitionDuration
           )
 
-          // Ensure next block stays hidden smoothly
+          // Ensure next block stays hidden until its turn
           if (index < totalBlocks - 1) {
             tl.to(
               [textBlocks[index + 1], images[index + 1]],
@@ -307,7 +312,7 @@ export default function About() {
                 duration: 0.01,
                 ease: 'none',
               },
-              prevTransitionStart + transitionDuration
+              blockEnd
             )
           }
         }
