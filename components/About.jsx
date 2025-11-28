@@ -320,10 +320,10 @@ export default function About() {
               {contentBlocks.map((block, index) => {
                 const isActive = activeBlock === index
                 
-                // Calculate dot width: active dot expands based on progress, inactive stays small
-                const dotWidth = isActive 
+                // Calculate dot dimensions: active dot expands, inactive stays circular
+                const dotSize = isActive 
                   ? Math.max(8, 8 + (blockProgress * 20)) // Expand from 8px to 28px
-                  : 2 // Inactive dots stay at 2px
+                  : 8 // Inactive dots are always 8px (circular)
                 
                 return (
                   <div
@@ -332,11 +332,14 @@ export default function About() {
                       isActive
                         ? 'bg-burgundy'
                         : 'bg-coffee-brown/30'
-                    } h-2 rounded-full`}
+                    } rounded-full`}
                     style={{ 
-                      width: `${dotWidth}px`, 
-                      minWidth: '2px',
-                      maxWidth: '28px'
+                      width: `${dotSize}px`,
+                      height: `${dotSize}px`,
+                      minWidth: '8px',
+                      minHeight: '8px',
+                      maxWidth: '28px',
+                      maxHeight: '28px'
                     }}
                     aria-label={block.heading}
                   >
