@@ -140,24 +140,26 @@ export default function About() {
           pinSpacing: true,
           onUpdate: (self) => {
             // Update active block based on scroll progress
-            const progress = self.progress
+            const progress = Math.min(Math.max(self.progress, 0), 1) // Clamp between 0 and 1
             const totalBlockProgress = progress * totalBlocks
             const currentBlock = Math.min(Math.floor(totalBlockProgress), totalBlocks - 1)
             
             // Calculate progress within the current block (0-1)
-            const progressInBlock = (totalBlockProgress - currentBlock) % 1
-            const normalizedBlockProgress = progressInBlock < 0 ? 0 : progressInBlock
+            const progressInBlock = totalBlockProgress - currentBlock
+            const normalizedBlockProgress = Math.min(Math.max(progressInBlock, 0), 1)
             
-            // Only update state if block changed to prevent excessive re-renders
+            // Update active block if changed
             if (previousBlockRef.current !== currentBlock) {
               previousBlockRef.current = currentBlock
               setActiveBlock(currentBlock)
             }
             
-            // Update block progress if it changed significantly (throttle updates)
-            if (Math.abs(previousProgressRef.current - normalizedBlockProgress) > 0.01) {
+            // Update block progress (use requestAnimationFrame for smoother updates)
+            if (Math.abs(previousProgressRef.current - normalizedBlockProgress) > 0.005) {
               previousProgressRef.current = normalizedBlockProgress
-              setBlockProgress(normalizedBlockProgress)
+              requestAnimationFrame(() => {
+                setBlockProgress(normalizedBlockProgress)
+              })
             }
             
             // Update progress bar directly with smooth animation
@@ -295,22 +297,32 @@ export default function About() {
             <div className="flex items-center space-x-2">
               {contentBlocks.map((block, index) => {
                 const isActive = activeBlock === index
-                const isNext = activeBlock === index - 1 && blockProgress > 0.5
-                const dotWidth = isActive 
-                  ? 8 + (blockProgress * 24) // Expand from 8px to 32px based on progress
-                  : isNext 
-                    ? 2 + (blockProgress * 6) // Slightly expand next dot
-                    : 2
+                const isPrevious = index === activeBlock - 1
+                const isNext = index === activeBlock + 1
+                
+                // Calculate dot width based on state
+                let dotWidth = 2 // Default inactive width
+                
+                if (isActive) {
+                  // Active dot: expand from 8px to 32px based on progress
+                  dotWidth = 8 + (blockProgress * 24)
+                } else if (isPrevious && blockProgress < 0.3) {
+                  // Previous dot: shrink slightly as we move away
+                  dotWidth = 2 + (blockProgress * 2)
+                } else if (isNext && blockProgress > 0.7) {
+                  // Next dot: expand slightly as we approach
+                  dotWidth = 2 + ((blockProgress - 0.7) * 6)
+                }
                 
                 return (
                   <div
                     key={block.id}
-                    className={`relative transition-all duration-100 ${
+                    className={`relative transition-all duration-200 ease-out ${
                       isActive
                         ? 'bg-burgundy'
                         : 'bg-coffee-brown/30'
                     } h-2 rounded-full`}
-                    style={{ width: `${dotWidth * 4}px` }}
+                    style={{ width: `${dotWidth}px`, minWidth: '2px' }}
                     aria-label={block.heading}
                   >
                     <span className="sr-only">{block.heading}</span>
