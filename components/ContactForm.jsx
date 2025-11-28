@@ -145,8 +145,8 @@ export default function ContactForm() {
               name="eventDate"
               value={formData.eventDate}
               onChange={handleChange}
-              className="w-full max-w-full px-4 py-3 rounded-lg border-2 border-burgundy/20 bg-cream text-coffee-brown focus:outline-none focus:border-burgundy focus:ring-2 focus:ring-burgundy/20 transition-all duration-300"
-              style={{ maxWidth: '100%', boxSizing: 'border-box' }}
+              className="w-full px-4 py-3 rounded-lg border-2 border-burgundy/20 bg-cream text-coffee-brown placeholder:text-gray-400 focus:outline-none focus:border-burgundy focus:ring-2 focus:ring-burgundy/20 transition-all duration-300"
+              style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', WebkitAppearance: 'none', MozAppearance: 'textfield' }}
             />
           </div>
 

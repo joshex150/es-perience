@@ -150,6 +150,8 @@ select {
   background-size: 12px;
   padding-right: 2.5rem;
   cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 select:focus {
@@ -160,4 +162,25 @@ select option {
   background-color: #FFF8E7;
   color: #4B2E2A;
   padding: 0.5rem;
+}
+
+/* Date Input Styling - Match Other Input Fields */
+input[type="date"] {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  padding: 0.25rem;
+  margin-left: 0.5rem;
+}
+
+input[type="date"]::-webkit-inner-spin-button,
+input[type="date"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
