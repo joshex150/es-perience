@@ -46,6 +46,7 @@ export default function About() {
   const progressBarRef = useRef(null)
   const previousBlockRef = useRef(0) // To optimize setActiveBlock updates
   const previousProgressRef = useRef(0) // To optimize blockProgress updates
+  const scrollTriggerRef = useRef(null) // Reference to ScrollTrigger instance
 
   useEffect(() => {
     // Ensure we're at the top before initializing GSAP to prevent scroll issues
@@ -133,22 +134,21 @@ export default function About() {
       const totalScrollDistance = 500 // Total scroll distance in vh
       const scrollPerBlock = totalScrollDistance / totalBlocks // Equal distance per block
       
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: `+=${totalScrollDistance}vh`, // Total scroll distance
-          scrub: 1.5, // Smoother scrubbing
-          pin: true,
-          anticipatePin: 1,
-          pinSpacing: true,
-          snap: {
-            snapTo: 1 / totalBlocks, // Snap to each block (0, 0.333, 0.666, 1.0)
-            duration: { min: 0.2, max: 0.6 },
-            delay: 0,
-            ease: 'power1.inOut',
-          },
-          onUpdate: (self) => {
+      const scrollTrigger = ScrollTrigger.create({
+        trigger: section,
+        start: 'top top',
+        end: `+=${totalScrollDistance}vh`, // Total scroll distance
+        scrub: 1.5, // Smoother scrubbing
+        pin: true,
+        anticipatePin: 1,
+        pinSpacing: true,
+        snap: {
+          snapTo: 1 / totalBlocks, // Snap to each block (0, 0.333, 0.666, 1.0)
+          duration: { min: 0.2, max: 0.6 },
+          delay: 0,
+          ease: 'power1.inOut',
+        },
+        onUpdate: (self) => {
             // Update active block based on scroll progress
             const progress = Math.min(Math.max(self.progress, 0), 1) // Clamp between 0 and 1
             
@@ -209,7 +209,12 @@ export default function About() {
               progressBarRef.current.style.width = `${progressPercent}%`
             }
           },
-        },
+      })
+      
+      scrollTriggerRef.current = scrollTrigger
+      
+      const tl = gsap.timeline({
+        scrollTrigger: scrollTrigger,
       })
       // Each block gets exactly equal scroll distance (normalized 0-1)
       const scrollPerBlockNormalized = 1 / totalBlocks
@@ -316,7 +321,7 @@ export default function About() {
     >
       <div className="max-w-7xl mx-auto lg:h-screen lg:max-h-[100vh] lg:flex lg:items-center py-8 lg:py-0 relative">
         {/* Progress Indicator - Desktop Only, Static Position */}
-        <div className="hidden lg:flex absolute bottom-20 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
+        <div className="hidden lg:flex absolute bottom-20 left-1/2 transform -translate-x-1/2 z-50">
           <div className="flex items-center space-x-3 bg-cream/95 backdrop-blur-md px-6 py-3 rounded-full shadow-xl border border-burgundy/20">
             {/* Progress Dots */}
             <div className="flex items-center space-x-4">
@@ -328,14 +333,37 @@ export default function About() {
                   ? Math.max(8, 8 + (blockProgress * 20)) // Expand from 8px to 28px
                   : 8 // Inactive dots are always 8px (circular)
                 
+                const handleDotClick = () => {
+                  if (scrollTriggerRef.current && sectionRef.current) {
+                    const totalScrollDistance = 500
+                    const scrollPerBlock = totalScrollDistance / contentBlocks.length
+                    const targetProgress = index / contentBlocks.length
+                    
+                    // Calculate the scroll position for this block
+                    const sectionTop = sectionRef.current.offsetTop
+                    const scrollTrigger = scrollTriggerRef.current
+                    const start = scrollTrigger.start
+                    const end = scrollTrigger.end
+                    const totalDistance = end - start
+                    const targetScroll = start + (totalDistance * targetProgress)
+                    
+                    // Scroll to the target position
+                    window.scrollTo({
+                      top: targetScroll,
+                      behavior: 'smooth'
+                    })
+                  }
+                }
+                
                 return (
-                  <div
+                  <button
                     key={block.id}
-                    className={`relative transition-all duration-300 ease-out ${
+                    onClick={handleDotClick}
+                    className={`relative transition-all duration-300 ease-out cursor-pointer hover:scale-110 focus:outline-none focus:ring-2 focus:ring-burgundy/50 rounded-full ${
                       isActive
                         ? 'bg-burgundy'
-                        : 'bg-coffee-brown/30'
-                    } rounded-full`}
+                        : 'bg-coffee-brown/30 hover:bg-coffee-brown/50'
+                    }`}
                     style={{ 
                       width: `${dotSize}px`,
                       height: `${dotSize}px`,
@@ -344,10 +372,11 @@ export default function About() {
                       maxWidth: '28px',
                       maxHeight: '28px'
                     }}
-                    aria-label={block.heading}
+                    aria-label={`Go to ${block.heading}`}
+                    aria-current={isActive ? 'true' : 'false'}
                   >
                     <span className="sr-only">{block.heading}</span>
-                  </div>
+                  </button>
                 )
               })}
             </div>
