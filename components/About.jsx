@@ -340,8 +340,8 @@ export default function About() {
     >
       <div className="max-w-7xl mx-auto lg:h-screen lg:max-h-[100vh] lg:flex lg:items-center py-8 lg:py-0 relative">
         {/* Progress Indicator - Desktop Only, Static Position */}
-        <div className="hidden lg:flex absolute bottom-20 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
-          <div className="flex items-center space-x-3 bg-cream/95 backdrop-blur-md px-6 py-3 rounded-full shadow-xl border border-burgundy/20">
+        <div className="hidden lg:flex absolute bottom-20 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="flex items-center space-x-3 bg-cream/95 backdrop-blur-md px-6 py-3 rounded-full shadow-xl border border-burgundy/20 pointer-events-auto">
             {/* Progress Dots */}
             <div className="flex items-center space-x-4">
               {contentBlocks.map((block, index) => {
@@ -359,40 +359,51 @@ export default function About() {
                   if (!sectionRef.current) return
                   
                   // Calculate target progress (0 to 1)
+                  // Use the start of each block for better alignment
                   const targetProgress = index / contentBlocks.length
                   
                   // Find the ScrollTrigger instance for this section
                   const allTriggers = ScrollTrigger.getAll()
-                  const sectionTrigger = allTriggers.find(st => st.vars.trigger === sectionRef.current)
+                  const sectionTrigger = allTriggers.find(st => {
+                    const trigger = st.vars?.trigger || st.trigger
+                    return trigger === sectionRef.current
+                  })
                   
                   if (sectionTrigger) {
-                    // Get the start and end positions of the ScrollTrigger
-                    const start = sectionTrigger.start
-                    const end = sectionTrigger.end
-                    const totalDistance = end - start
-                    
-                    // Calculate target scroll position
-                    const targetScroll = start + (totalDistance * targetProgress)
-                    
-                    // Scroll to target position using smooth scroll
-                    window.scrollTo({
-                      top: targetScroll,
-                      behavior: 'smooth'
-                    })
-                  } else {
-                    // Fallback: calculate manually
-                    const sectionTop = sectionRef.current.offsetTop
-                    const totalScrollDistance = 500 // vh
-                    const viewportHeight = window.innerHeight
-                    const totalScrollPixels = (totalScrollDistance / 100) * viewportHeight
-                    const targetScrollInSection = targetProgress * totalScrollPixels
-                    const targetScroll = sectionTop + targetScrollInSection
-                    
-                    window.scrollTo({
-                      top: targetScroll,
-                      behavior: 'smooth'
-                    })
+                    try {
+                      // Get the start and end positions of the ScrollTrigger
+                      const start = sectionTrigger.start || sectionTrigger.vars?.start
+                      const end = sectionTrigger.end || sectionTrigger.vars?.end
+                      
+                      if (start !== undefined && end !== undefined) {
+                        const totalDistance = end - start
+                        // Calculate target scroll position
+                        const targetScroll = start + (totalDistance * targetProgress)
+                        
+                        // Scroll to target position using smooth scroll
+                        window.scrollTo({
+                          top: targetScroll,
+                          behavior: 'smooth'
+                        })
+                        return
+                      }
+                    } catch (error) {
+                      console.warn('Error accessing ScrollTrigger:', error)
+                    }
                   }
+                  
+                  // Fallback: calculate manually using section position
+                  const sectionTop = sectionRef.current.offsetTop
+                  const totalScrollDistance = 500 // vh
+                  const viewportHeight = window.innerHeight
+                  const totalScrollPixels = (totalScrollDistance / 100) * viewportHeight
+                  const targetScrollInSection = targetProgress * totalScrollPixels
+                  const targetScroll = sectionTop + targetScrollInSection
+                  
+                  window.scrollTo({
+                    top: targetScroll,
+                    behavior: 'smooth'
+                  })
                 }
                 
                 return (
