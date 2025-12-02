@@ -46,7 +46,6 @@ export default function About() {
   const progressBarRef = useRef(null)
   const previousBlockRef = useRef(0) // To optimize setActiveBlock updates
   const previousProgressRef = useRef(0) // To optimize blockProgress updates
-  const scrollTriggerInstanceRef = useRef(null) // Reference to ScrollTrigger instance
 
   useEffect(() => {
     // Ensure we're at the top before initializing GSAP to prevent scroll issues
@@ -134,21 +133,22 @@ export default function About() {
       const totalScrollDistance = 500 // Total scroll distance in vh
       const scrollPerBlock = totalScrollDistance / totalBlocks // Equal distance per block
       
-      const scrollTriggerConfig = {
-        trigger: section,
-        start: 'top top',
-        end: `+=${totalScrollDistance}vh`, // Total scroll distance
-        scrub: 1.5, // Smoother scrubbing
-        pin: true,
-        anticipatePin: 1,
-        pinSpacing: true,
-        snap: {
-          snapTo: 1 / totalBlocks, // Snap to each block (0, 0.333, 0.666, 1.0)
-          duration: { min: 0.2, max: 0.6 },
-          delay: 0,
-          ease: 'power1.inOut',
-        },
-        onUpdate: (self) => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: 'top top',
+          end: `+=${totalScrollDistance}vh`, // Total scroll distance
+          scrub: 1.5, // Smoother scrubbing
+          pin: true,
+          anticipatePin: 1,
+          pinSpacing: true,
+          snap: {
+            snapTo: 1 / totalBlocks, // Snap to each block (0, 0.333, 0.666, 1.0)
+            duration: { min: 0.2, max: 0.6 },
+            delay: 0,
+            ease: 'power1.inOut',
+          },
+          onUpdate: (self) => {
             // Update active block based on scroll progress
             const progress = Math.min(Math.max(self.progress, 0), 1) // Clamp between 0 and 1
             
@@ -209,32 +209,8 @@ export default function About() {
               progressBarRef.current.style.width = `${progressPercent}%`
             }
           },
-        }
-      
-      const tl = gsap.timeline({
-        scrollTrigger: scrollTriggerConfig,
+        },
       })
-      
-      // Store ScrollTrigger instance for dot click navigation
-      const scrollTriggerInstance = ScrollTrigger.getById(tl.scrollTrigger?.vars?.id || ScrollTrigger.getAll().find(st => st.vars.trigger === section)?.vars?.id)
-      if (!scrollTriggerInstance) {
-        // Get the ScrollTrigger instance from the timeline
-        const allTriggers = ScrollTrigger.getAll()
-        const sectionTrigger = allTriggers.find(st => st.vars.trigger === section)
-        if (sectionTrigger) {
-          scrollTriggerInstanceRef.current = sectionTrigger
-        }
-      } else {
-        scrollTriggerInstanceRef.current = scrollTriggerInstance
-      }
-      
-      // Alternative: Get ScrollTrigger from timeline after it's created
-      setTimeout(() => {
-        const timelineScrollTrigger = tl.scrollTrigger
-        if (timelineScrollTrigger) {
-          scrollTriggerInstanceRef.current = timelineScrollTrigger
-        }
-      }, 100)
       // Each block gets exactly equal scroll distance (normalized 0-1)
       const scrollPerBlockNormalized = 1 / totalBlocks
       const transitionDuration = scrollPerBlockNormalized * 0.2 // Transition takes 20% of block time
@@ -340,8 +316,8 @@ export default function About() {
     >
       <div className="max-w-7xl mx-auto lg:h-screen lg:max-h-[100vh] lg:flex lg:items-center py-8 lg:py-0 relative">
         {/* Progress Indicator - Desktop Only, Static Position */}
-        <div className="hidden lg:flex absolute bottom-20 left-1/2 transform -translate-x-1/2 z-50">
-          <div className="flex items-center space-x-3 bg-cream/95 backdrop-blur-md px-6 py-3 rounded-full shadow-xl border border-burgundy/20 pointer-events-auto">
+        <div className="hidden lg:flex absolute bottom-20 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
+          <div className="flex items-center space-x-3 bg-cream/95 backdrop-blur-md px-6 py-3 rounded-full shadow-xl border border-burgundy/20">
             {/* Progress Dots */}
             <div className="flex items-center space-x-4">
               {contentBlocks.map((block, index) => {
@@ -352,69 +328,14 @@ export default function About() {
                   ? Math.max(8, 8 + (blockProgress * 20)) // Expand from 8px to 28px
                   : 8 // Inactive dots are always 8px (circular)
                 
-                const handleDotClick = (e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  
-                  if (!sectionRef.current) return
-                  
-                  // Calculate target progress (0 to 1)
-                  // Use the start of each block for better alignment
-                  const targetProgress = index / contentBlocks.length
-                  
-                  // Find the ScrollTrigger instance for this section
-                  const allTriggers = ScrollTrigger.getAll()
-                  const sectionTrigger = allTriggers.find(st => {
-                    const trigger = st.vars?.trigger || st.trigger
-                    return trigger === sectionRef.current
-                  })
-                  
-                  if (sectionTrigger) {
-                    try {
-                      // Get the start and end positions of the ScrollTrigger
-                      const start = sectionTrigger.start || sectionTrigger.vars?.start
-                      const end = sectionTrigger.end || sectionTrigger.vars?.end
-                      
-                      if (start !== undefined && end !== undefined) {
-                        const totalDistance = end - start
-                        // Calculate target scroll position
-                        const targetScroll = start + (totalDistance * targetProgress)
-                        
-                        // Scroll to target position using smooth scroll
-                        window.scrollTo({
-                          top: targetScroll,
-                          behavior: 'smooth'
-                        })
-                        return
-                      }
-                    } catch (error) {
-                      console.warn('Error accessing ScrollTrigger:', error)
-                    }
-                  }
-                  
-                  // Fallback: calculate manually using section position
-                  const sectionTop = sectionRef.current.offsetTop
-                  const totalScrollDistance = 500 // vh
-                  const viewportHeight = window.innerHeight
-                  const totalScrollPixels = (totalScrollDistance / 100) * viewportHeight
-                  const targetScrollInSection = targetProgress * totalScrollPixels
-                  const targetScroll = sectionTop + targetScrollInSection
-                  
-                  window.scrollTo({
-                    top: targetScroll,
-                    behavior: 'smooth'
-                  })
-                }
-                
                 return (
-                  <button
+                  <div
                     key={block.id}
-                    onClick={handleDotClick}
-                    className={`relative transition-all duration-300 ease-out cursor-pointer hover:scale-110 focus:outline-none focus:ring-2 focus:ring-burgundy/50 rounded-full ${
+                    className={`relative transition-all duration-300 ease-out ${
                       isActive
                         ? 'bg-burgundy'
-                        : 'bg-coffee-brown/30 hover:bg-coffee-brown/50'
-                    }`}
+                        : 'bg-coffee-brown/30'
+                    } rounded-full`}
                     style={{ 
                       width: `${dotSize}px`,
                       height: `${dotSize}px`,
@@ -423,11 +344,10 @@ export default function About() {
                       maxWidth: '28px',
                       maxHeight: '28px'
                     }}
-                    aria-label={`Go to ${block.heading}`}
-                    aria-current={isActive ? 'true' : 'false'}
+                    aria-label={block.heading}
                   >
                     <span className="sr-only">{block.heading}</span>
-                  </button>
+                  </div>
                 )
               })}
             </div>
